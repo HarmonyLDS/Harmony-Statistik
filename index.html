@@ -222,4 +222,190 @@
       { name: "Antenne-Steilshoop", type: "lautfm", url: "https://laut.fm", tags: ["harmony_mo", "harmony_sa"] },
       { name: "Bergers-MusikParadies", type: "lautfm", url: "https://laut.fm", tags: ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"] },
       { name: "Bergers-SchlagerParadies", type: "lautfm", url: "https://laut.fm", tags: ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"] },
-      { name: "Charlys-Funradio (cfr)", type: "lautfm", url: "https://laut.fm", tags: ["harmony_mo"] },
+      { name: "Charlys-Funradio (cfr)", type: "lautfm", url: "https://laut.fm", tags: ["harmony_mo"] }
+    ];
+
+    const TAB_LABELS = {
+      harmony_mo: "Harmony – Montag",
+      harmony_sa: "Harmony – Samstag",
+      bernie_di: "Bernie – Dienstag",
+      bernie_do: "Bernie – Donnerstag",
+      all: "Alle Radios"
+    };
+
+    let currentTab = "harmony_mo";
+    let radioStates = RADIOS.map(r => ({
+      ...r,
+      status: "loading",
+      listeners: 0,
+      song: "Lade Stream-Daten..."
+    }));
+
+    function setTab(tab, btn) {
+      currentTab = tab;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      document.getElementById("active-subtitle").textContent = "Ansicht: " + (TAB_LABELS[tab] || tab);
+      render();
+    }
+
+    function slugifyLautFm(name) {
+      return name
+        .toLowerCase()
+        .replace(/\(.*?\)/g, "")
+        .trim()
+        .replace(/[^a-z0-9\-]/g, "");
+    }
+
+    async function fetchRadioStatus(radio) {
+      try {
+        if (radio.type === "lautfm") {
+          const slug = slugifyLautFm(radio.name);
+          const res = await fetch(`https://laut.fm{slug}`);
+          if (!res.ok) throw new Error("laut.fm nicht erreichbar");
+          const data = await res.json();
+          const songTitle = data.current_song
+            ? `${data.current_song.artist?.name || ""} - ${data.current_song.title || ""}`.replace(/^ - | - $/g, "")
+            : "Live-Stream aktiv";
+          return {
+            status: "online",
+            listeners: Number(data.listeners) || 0,
+            song: songTitle || "Kein Titel verfügbar"
+          };
+        }
+
+        const proxyUrl = `https://allorigins.win{encodeURIComponent(radio.url)}`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        const res = await fetch(proxyUrl, { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error("Proxy-Fehler");
+        const wrapper = await res.json();
+        const text = wrapper.contents || "";
+
+        if (text.length > 0) {
+          let listeners = 0;
+          let song = "Stream online";
+
+          try {
+            const json = JSON.parse(text);
+            if (Array.isArray(json) && json[0]?.listeners) {
+              listeners = Number(json[0].listeners.current) || 0;
+              song = json[0].now_playing?.song?.text || song;
+            } else if (json.icestats?.source) {
+              const src = Array.isArray(json.icestats.source) ? json.icestats.source[0] : json.icestats.source;
+              listeners = Number(src.listeners) || 0;
+              song = src.title || song;
+            } else if (typeof json.currentlisteners !== "undefined") {
+              listeners = Number(json.currentlisteners) || 0;
+              song = json.songtitle || song;
+            }
+          } catch (_) {
+            const matchListeners = text.match(/Current Stream Information.*?(\d+)\s*of\s*\d+/i) || text.match(/"listeners"\s*:\s*(\d+)/i);
+            if (matchListeners) listeners = Number(matchListeners[1]) || 0;
+          }
+
+          return { status: "online", listeners, song };
+        }
+
+        return { status: "offline", listeners: 0, song: "Offline / Nicht erreichbar" };
+      } catch (err) {
+        return { status: "offline", listeners: 0, song: "Offline / Keine Antwort" };
+      }
+    }
+
+    async function refreshAll() {
+      const updateEl = document.getElementById("last-update");
+      updateEl.textContent = "Aktualisiere Live-Daten...";
+
+      const results = await Promise.all(
+        RADIOS.map(async (r) => {
+          const info = await fetchRadioStatus(r);
+          return { ...r, ...info };
+        })
+      );
+
+      radioStates = results;
+      render();
+
+      const now = new Date();
+      updateEl.textContent = "Letztes Update: " + now.toLocaleTimeString("de-DE");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function render() {
+      const search = document.getElementById("search").value.toLowerCase().trim();
+      const filterStatus = document.getElementById("filter-status").value;
+      const sortBy = document.getElementById("sort-by").value;
+
+      let tabList = radioStates.filter(r => currentTab === "all" || r.tags.includes(currentTab));
+
+      const totalListeners = tabList.reduce((acc, r) => acc + (r.status === "online" ? r.listeners : 0), 0);
+      const onlineCount = tabList.filter(r => r.status === "online").length;
+      const offlineCount = tabList.filter(r => r.status === "offline").length;
+
+      document.getElementById("sum-listeners").textContent = totalListeners;
+      document.getElementById("sum-online").textContent = onlineCount;
+      document.getElementById("sum-offline").textContent = offlineCount;
+      document.getElementById("sum-total").textContent = tabList.length;
+
+      let visible = tabList.filter(r => {
+        if (filterStatus === "online" && r.status !== "online") return false;
+        if (filterStatus === "offline" && r.status !== "offline") return false;
+        if (search) {
+          const hay = (r.name + " " + r.song).toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+
+      visible.sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        if (sortBy === "listeners") {
+          if (b.listeners !== a.listeners) return b.listeners - a.listeners;
+        }
+        return a.name.localeCompare(b.name, "de");
+      });
+
+      const grid = document.getElementById("grid");
+      if (visible.length === 0) {
+        grid.innerHTML = `<div class="card"><div class="song">Keine Radios für diese Auswahl gefunden.</div></div>`;
+        return;
+      }
+
+      grid.innerHTML = visible.map(r => {
+        const badgeClass = r.status === "online" ? "on" : (r.status === "offline" ? "off" : "load");
+        const badgeText = r.status === "online" ? `ONLINE • ${r.listeners}` : (r.status === "offline" ? "OFFLINE" : "LÄDT...");
+        const cardClass = `card ${r.status} ${r.pinned ? "pinned" : ""}`.trim();
+
+        return `
+          <div class="${cardClass}">
+            <div class="card-top">
+              <div class="radio-name" title="${escapeHtml(r.name)}">${r.pinned ? "⭐ " : ""}${escapeHtml(r.name)}</div>
+              <span class="badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="song" title="${escapeHtml(r.song)}">🎵 ${escapeHtml(r.song)}</div>
+            <div class="meta">
+              <span>Server: ${escapeHtml(r.type.toUpperCase())}</span>
+              <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="color: var(--orange-light); text-decoration: none;">Stream öffnen ↗</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    render();
+    refreshAll();
+    setInterval(refreshAll, 30000);
+  </script>
+</body>
+</html>
