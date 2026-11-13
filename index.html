@@ -207,15 +207,10 @@
     const ALL_DAYS = ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"];
 
     const RADIOS = [
-      // Pinned
       { name: "Harmonys-Jukebox", type: "lautfm", url: "https://laut.fm", pinned: true, tags: ALL_DAYS },
-
-      // AzuraCast
       { name: "Radio Schmölln", type: "azuracast", url: "https://streamingcloud.online", tags: ALL_DAYS },
       { name: "beatsXpress", type: "azuracast", url: "https://nexusradio-hosting.de", tags: ["harmony_mo", "harmony_sa"] },
       { name: "Radio AlterKessel", type: "azuracast", url: "https://jom-hosting.de", tags: ["bernie_di"] },
-
-      // Shoutcast v2
       { name: "Hitradio-Breitungen", type: "shoutcast", url: "http://genx-stream.de", tags: ["harmony_mo", "bernie_di"] },
       { name: "Joker-Radio", type: "shoutcast", url: "http://streamserver24.com", tags: ["harmony_sa", "bernie_di"] },
       { name: "Power-of-Dream", type: "shoutcast", url: "http://pofd-hosting.de", tags: ["harmony_mo", "harmony_sa"] },
@@ -223,21 +218,15 @@
       { name: "RadioDD63", type: "shoutcast", url: "https://streamplus.de", tags: ["harmony_mo", "harmony_sa", "bernie_di"] },
       { name: "RWWO RADIO", type: "shoutcast", url: "http://92.222.193.229:8204", tags: ["harmony_mo", "harmony_sa"] },
       { name: "Summer-Beats-Radio", type: "shoutcast", url: "https://mein-radiostream.de", tags: ["harmony_mo"] },
-
-      // spcast (Icecast Multi-Mount)
       { name: "GartenHeimRadio", type: "icecast", url: "https://spcast.eu", tags: ["harmony_mo", "harmony_sa", "bernie_di"] },
       { name: "RadioFunAndMore", type: "icecast", url: "https://spcast.eu", tags: ["bernie_di"] },
-
-      // Custom API (aggregiert)
       { name: "1Chaos71 (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: ALL_DAYS },
       { name: "Florian (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: ALL_DAYS },
       { name: "Schlagermax (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: ALL_DAYS },
-
-      // laut.fm
       { name: "Antenne Fehmarn", type: "lautfm", url: "https://laut.fm", tags: ["bernie_di"] },
+      { name: "Antenne-Steilshoop", type: "lautfm", url: "https://laut.fm", tags: ["harmony_mo", "harmony_sa"] },
+      { name: "AntenneKrefeld", type: "lautfm", url: "https://laut.fm", tags: ALL_DAYS },
 Verwende Code mit Vorsicht.
-{ name: "Antenne-Steilshoop", type: "lautfm", url: "laut.fm", tags: ["harmony_mo", "harmony_sa"] },
-{ name: "AntenneKrefeld", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
 { name: "Bergers-MusikParadies", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
 { name: "Bergers-SchlagerParadies", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
 { name: "Charlys-Funradio (cfr)", type: "lautfm", url: "laut.fm", tags: ["harmony_mo"] },
@@ -316,45 +305,53 @@ bernie_do: "Bernie – Donnerstag",
 all: "Alle Radios"
 };
 let currentTab = "all";
-let radioStates = RADIOS.map(r => ({
-...r,
+let radioStates = RADIOS.map(function(r) {
+return {
+name: r.name,
+type: r.type,
+url: r.url,
+pinned: !!r.pinned,
+tags: r.tags,
 status: "loading",
 listeners: 0,
 song: "Lade Stream-Daten..."
-}));
+};
+});
 function setTab(tab, btn) {
 currentTab = tab;
-document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+document.querySelectorAll(".tab-btn").forEach(function(b) {
+b.classList.remove("active");
+});
 if (btn) btn.classList.add("active");
 document.getElementById("active-subtitle").textContent = "Ansicht: " + (TAB_LABELS[tab] || tab);
 render();
 }
-async function fetchText(url, timeoutMs = 8000) {
+async function fetchText(url, timeoutMs) {
 const controller = new AbortController();
-const timer = setTimeout(() => controller.abort(), timeoutMs);
+const timer = setTimeout(function() { controller.abort(); }, timeoutMs || 8000);
 try {
 const res = await fetch(url, { signal: controller.signal });
 clearTimeout(timer);
 if (!res.ok) return null;
 return await res.text();
-} catch (_) {
+} catch (e) {
 clearTimeout(timer);
 return null;
 }
 }
 async function fetchWithFallback(targetUrl) {
-if (targetUrl.startsWith("https://")) {
+if (targetUrl.indexOf("https://") === 0) {
 const direct = await fetchText(targetUrl, 7000);
 if (direct) return direct;
 }
-const proxy1 = await fetchText(https://codetabs.com{encodeURIComponent(targetUrl)}, 9000);
+const proxy1 = await fetchText("codetabs.com" + encodeURIComponent(targetUrl), 9000);
 if (proxy1) return proxy1;
-const proxy2Raw = await fetchText(https://allorigins.win{encodeURIComponent(targetUrl)}, 9000);
+const proxy2Raw = await fetchText("allorigins.win" + encodeURIComponent(targetUrl), 9000);
 if (proxy2Raw) {
 try {
 const parsed = JSON.parse(proxy2Raw);
 if (parsed && parsed.contents) return parsed.contents;
-} catch (_) {}
+} catch (e) {}
 }
 return null;
 }
@@ -362,16 +359,19 @@ async function fetchRadioStatus(radio) {
 try {
 if (radio.type === "lautfm") {
 const slug = radio.url.replace(//+$/, "").split("/").pop();
-const text = await fetchText(https://laut.fm{slug}, 8000);
+const text = await fetchText("laut.fm" + slug, 8000);
 if (!text) throw new Error("laut.fm Fehler");
 const data = JSON.parse(text);
-const songTitle = data.current_song
-? ${data.current_song.artist?.name || ""} - ${data.current_song.title || ""}.replace(/^ - | - $/g, "")
-: "Live-Stream aktiv";
+let songTitle = "Live-Stream aktiv";
+if (data.current_song) {
+const artist = (data.current_song.artist && data.current_song.artist.name) ? data.current_song.artist.name : "";
+const title = data.current_song.title || "";
+songTitle = (artist + " - " + title).replace(/^ - | - $/g, "") || "Live-Stream aktiv";
+}
 return {
 status: "online",
 listeners: Number(data.listeners) || 0,
-song: songTitle || "Live-Stream aktiv"
+song: songTitle
 };
 }
 if (radio.type === "azuracast") {
@@ -381,49 +381,50 @@ const json = JSON.parse(text);
 const item = Array.isArray(json) ? json[0] : json;
 return {
 status: "online",
-listeners: Number(item?.listeners?.current) || 0,
-song: item?.now_playing?.song?.text || "Live-Stream aktiv"
+listeners: Number(item && item.listeners && item.listeners.current) || 0,
+song: (item && item.now_playing && item.now_playing.song && item.now_playing.song.text) || "Live-Stream aktiv"
 };
 }
 if (radio.type === "custom") {
 const text = await fetchWithFallback(radio.url);
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
-const listeners = Number(json.listeners ?? json.currentlisteners ?? json.total_listeners ?? 0);
+const listeners = Number(json.listeners || json.currentlisteners || json.total_listeners || 0);
 const song = json.song || json.songtitle || json.title || "Live-Stream aktiv";
 return {
 status: json.online === false ? "offline" : "online",
-listeners,
-song
+listeners: listeners,
+song: song
 };
 }
 if (radio.type === "icecast") {
 const baseUrl = radio.url.replace(//+$/, "");
-const text = await fetchWithFallback(${baseUrl}/status-json.xsl);
+const text = await fetchWithFallback(baseUrl + "/status-json.xsl");
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
-const sources = json.icestats?.source;
+const sources = json.icestats && json.icestats.source;
 if (!sources) throw new Error("Keine Quelle");
 const list = Array.isArray(sources) ? sources : [sources];
-const listeners = list.reduce((sum, s) => sum + (Number(s.listeners) || 0), 0);
-const song = list.find(s => s.title)?.title || "Live-Stream aktiv";
-return { status: "online", listeners, song };
+const listeners = list.reduce(function(sum, s) { return sum + (Number(s.listeners) || 0); }, 0);
+const withTitle = list.find(function(s) { return s.title; });
+const song = (withTitle && withTitle.title) || "Live-Stream aktiv";
+return { status: "online", listeners: listeners, song: song };
 }
 if (radio.type === "shoutcast") {
 const baseUrl = radio.url.replace(//+$/, "");
-const text = await fetchWithFallback(${baseUrl}/stats?json=1);
+const text = await fetchWithFallback(baseUrl + "/stats?json=1");
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
-const listeners = Number(json.currentlisteners ?? json.uniquelisteners ?? 0);
+const listeners = Number(json.currentlisteners || json.uniquelisteners || 0);
 const song = json.songtitle || "Live-Stream aktiv";
 return {
 status: Number(json.streamstatus) === 0 ? "offline" : "online",
-listeners,
-song
+listeners: listeners,
+song: song
 };
 }
 return { status: "offline", listeners: 0, song: "Offline / Nicht erreichbar" };
-} catch (_) {
+} catch (e) {
 return { status: "offline", listeners: 0, song: "Offline / Keine Antwort" };
 }
 }
@@ -431,19 +432,28 @@ async function refreshAll() {
 const updateEl = document.getElementById("last-update");
 updateEl.textContent = "Aktualisiere Live-Daten...";
 const batchSize = 12;
-const updated = [...radioStates];
+const updated = radioStates.slice();
 for (let i = 0; i < RADIOS.length; i += batchSize) {
 const batch = RADIOS.slice(i, i + batchSize);
 const results = await Promise.all(
-batch.map(async (r) => {
+batch.map(async function(r) {
 const info = await fetchRadioStatus(r);
-return { ...r, ...info };
+return {
+name: r.name,
+type: r.type,
+url: r.url,
+pinned: !!r.pinned,
+tags: r.tags,
+status: info.status,
+listeners: info.listeners,
+song: info.song
+};
 })
 );
 for (let j = 0; j < results.length; j++) {
 updated[i + j] = results[j];
 }
-radioStates = [...updated];
+radioStates = updated.slice();
 render();
 }
 const now = new Date();
@@ -460,24 +470,28 @@ function render() {
 const search = document.getElementById("search").value.toLowerCase().trim();
 const filterStatus = document.getElementById("filter-status").value;
 const sortBy = document.getElementById("sort-by").value;
-let tabList = radioStates.filter(r => currentTab === "all" || r.tags.includes(currentTab));
-const totalListeners = tabList.reduce((acc, r) => acc + (r.status === "online" ? r.listeners : 0), 0);
-const onlineCount = tabList.filter(r => r.status === "online").length;
-const offlineCount = tabList.filter(r => r.status === "offline").length;
+const tabList = radioStates.filter(function(r) {
+return currentTab === "all" || r.tags.indexOf(currentTab) !== -1;
+});
+const totalListeners = tabList.reduce(function(acc, r) {
+return acc + (r.status === "online" ? r.listeners : 0);
+}, 0);
+const onlineCount = tabList.filter(function(r) { return r.status === "online"; }).length;
+const offlineCount = tabList.filter(function(r) { return r.status === "offline"; }).length;
 document.getElementById("sum-listeners").textContent = totalListeners;
 document.getElementById("sum-online").textContent = onlineCount;
 document.getElementById("sum-offline").textContent = offlineCount;
 document.getElementById("sum-total").textContent = tabList.length;
-let visible = tabList.filter(r => {
+const visible = tabList.filter(function(r) {
 if (filterStatus === "online" && r.status !== "online") return false;
 if (filterStatus === "offline" && r.status !== "offline") return false;
 if (search) {
 const hay = (r.name + " " + r.song).toLowerCase();
-if (!hay.includes(search)) return false;
+if (hay.indexOf(search) === -1) return false;
 }
 return true;
 });
-visible.sort((a, b) => {
+visible.sort(function(a, b) {
 if (a.pinned && !b.pinned) return -1;
 if (!a.pinned && b.pinned) return 1;
 if (sortBy === "listeners") {
@@ -487,19 +501,29 @@ return a.name.localeCompare(b.name, "de");
 });
 const grid = document.getElementById("grid");
 if (visible.length === 0) {
-grid.innerHTML = <div class="card"><div class="song">Keine Radios für diese Auswahl gefunden.</div></div>;
+grid.innerHTML = 'Keine Radios für diese Auswahl gefunden.';
 return;
 }
-grid.innerHTML = visible.map(r => {
+grid.innerHTML = visible.map(function(r) {
 const badgeClass = r.status === "online" ? "on" : (r.status === "offline" ? "off" : "load");
-const badgeText = r.status === "online" ? ONLINE • ${r.listeners} : (r.status === "offline" ? "OFFLINE" : "LÄDT...");
-const cardClass = card ${r.status} ${r.pinned ? "pinned" : ""}.trim();
-return <div class="${cardClass}"> <div class="card-top"> <div class="radio-name" title="${escapeHtml(r.name)}">${r.pinned ? "⭐ " : ""}${escapeHtml(r.name)}</div> <span class="badge ${badgeClass}">${badgeText}</span> </div> <div class="song" title="${escapeHtml(r.song)}">🎵 ${escapeHtml(r.song)}</div> <div class="meta"> <span>Server: ${escapeHtml(r.type.toUpperCase())}</span> <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="color: var(--orange-light); text-decoration: none;">Stream öffnen ↗</a> </div> </div>;
+const badgeText = r.status === "online" ? ("ONLINE • " + r.listeners) : (r.status === "offline" ? "OFFLINE" : "LÄDT...");
+const cardClass = ("card " + r.status + (r.pinned ? " pinned" : "")).trim();
+const star = r.pinned ? "⭐ " : "";
+return '' +
+'' +
+'' + star + escapeHtml(r.name) + '' +
+'' + badgeText + '' +
+'' +
+'🎵 ' + escapeHtml(r.song) + '' +
+'' +
+'Server: ' + escapeHtml(r.type.toUpperCase()) + '' +
+'Stream öffnen ↗' +
+'' +
+'';
 }).join("");
 }
 render();
 refreshAll();
 setInterval(refreshAll, 30000);
-</script>
-</body>
-</html>
+
+
