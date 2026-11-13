@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harmonys-Jukebox – Live Radio-Statistik</title>
+  <style>
+    :root {
+      --bg: #0f1322;
+      --card: #161b2e;
+      --border: rgba(255, 123, 0, 0.35);
+      --orange: #ff7b00;
+      --orange-light: #ffb703;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body {
+      background: radial-gradient(circle at top, #1b233d 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px 14px 50px;
+    }
+    .container { max-width: 1180px; margin: 0 auto; }
+    header {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--orange);
+    }
+    .brand p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .stats-bar { display: flex; flex-wrap: wrap; gap: 12px; }
+    .stat-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 16px;
+      min-width: 115px;
+      text-align: center;
+    }
+    .stat-val { font-size: 22px; font-weight: 800; }
+    .stat-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-top: 2px; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+    input[type="text"], select {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="text"] { flex: 1; min-width: 220px; }
+    input[type="text"]:focus, select:focus { border-color: var(--orange); }
+    button.btn {
+      background: linear-gradient(135deg, var(--orange-light), var(--orange));
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button.btn:hover { opacity: 0.9; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 16px;
+      border-left: 5px solid #475569;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.12s;
+    }
+    .card.online { border-left-color: var(--green); }
+    .card.offline { border-left-color: var(--red); opacity: 0.78; }
+    .card.pinned {
+      border: 1.5px solid var(--orange);
+      border-left: 6px solid var(--orange);
+      box-shadow: 0 0 18px rgba(255, 123, 0, 0.25);
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .radio-name {
+      font-weight: 700;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .badge.on { background: rgba(34, 197, 94, 0.18); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .badge.off { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge.load { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    .song {
+      font-size: 13px;
+      color: #e2e8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .status-line {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>Harmonys-Jukebox – Live Radio-Statistik</h1>
+        <p>Live-Hörerzahlen &amp; aktuelle Titel im Überblick</p>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-box">
+          <div id="sum-listeners" class="stat-val" style="color: var(--orange);">0</div>
+          <div class="stat-lbl">Hörer Gesamt</div>
+        </div>
+        <div class="stat-box">
+          <div id="sum-online" class="stat-val" style="color: var(--green);">0</div>
+          <div class="stat-lbl">Online</div>
+        </div>
+        <div class="stat-box">
+          <div id="sum-offline" class="stat-val" style="color: var(--red);">0</div>
+          <div class="stat-lbl">Offline</div>
+        </div>
+        <div class="stat-box">
+          <div id="sum-total" class="stat-val">0</div>
+          <div class="stat-lbl">Radios</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <input type="text" id="search" placeholder="Radio oder Songtitel suchen..." oninput="render()" />
+      <select id="filter-status" onchange="render()">
+        <option value="all">Alle anzeigen</option>
+        <option value="online">Nur Online (Grün)</option>
+        <option value="offline">Nur Offline (Rot)</option>
+      </select>
+      <select id="sort-by" onchange="render()">
+        <option value="listeners">Sortierung: Meiste Hörer</option>
+        <option value="name">Sortierung: Name (A–Z)</option>
+      </select>
+      <button class="btn" onclick="refreshAll()">↻ Jetzt aktualisieren</button>
+    </div>
+
+    <div class="status-line">
+      <span id="last-update">Lade Live-Daten...</span>
+      <span>Automatische Aktualisierung alle 30 Sekunden</span>
+    </div>
+
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <script>
+    const RADIOS = [
+      { name: "Harmonys-Jukebox", type: "lautfm", url: "https://laut.fm", pinned: true },
+      { name: "Hitradio-Breitungen", type: "shoutcast", url: "http://genx-stream.de" },
+      { name: "Joker-Radio", type: "shoutcast", url: "http://streamserver24.com" },
+      { name: "Power-of-Dream", type: "shoutcast", url: "http://pofd-hosting.de" },
+      { name: "Radio-Forum", type: "shoutcast", url: "http://178.33.33.176:8110" },
+      { name: "RadioDD63", type: "shoutcast", url: "https://streamplus.de" },
+      { name: "RWWO RADIO", type: "shoutcast", url: "http://92.222.193.229:8204" },
+      { name: "Summer-Beats-Radio", type: "shoutcast", url: "https://mein-radiostream.de" },
+      { name: "GartenHeimRadio", type: "icecast", url: "https://spcast.eu" },
+      { name: "RadioFunAndMore", type: "icecast", url: "https://spcast.eu" },
+      { name: "beatsXpress", type: "azuracast", url: "https://nexusradio-hosting.de" },
+      { name: "Radio AlterKessel", type: "azuracast", url: "https://jom-hosting.de" },
+      { name: "Antenne Fehmarn", type: "lautfm", url: "https://laut.fm" },
+      { name: "Antenne-Schiebock", type: "lautfm", url: "https://laut.fm" },
+      { name: "Antenne-Steilshoop", type: "lautfm", url: "https://laut.fm" },
+      { name: "AntenneKrefeld", type: "lautfm", url: "https://laut.fm" },
+      { name: "Bergers-MusikParadies", type: "lautfm", url: "https://laut.fm" },
+      { name: "Bergers-SchlagerParadies", type: "lautfm", url: "https://laut.fm" },
+      { name: "Charlys-Funradio (cfr)", type: "lautfm", url: "https://laut.fm" },
+      { name: "Crazy-Fox-Radio (BlackTiger)", type: "lautfm", url: "https://laut.fm" },
+      { name: "DattKüstenRadio", type: "lautfm", url: "https://laut.fm" },
+      { name: "DerBruklerFM", type: "lautfm", url: "https://laut.fm" },
+      { name: "Disco-Power-Radio (crazyhomeradio)", type: "lautfm", url: "https://laut.fm" },
+      { name: "DJ Raimund", type: "lautfm", url: "https://laut.fm" },
+      { name: "Eberts-KaffeeRadio", type: "lautfm", url: "https://laut.fm" },
+      { name: "Elbe-Deutsch", type: "lautfm", url: "https://laut.fm" },
+      { name: "Fabian-Dance-Radio", type: "lautfm", url: "https://laut.fm" },
+      { name: "Familienradio-Düsseldorf", type: "lautfm", url: "https://laut.fm" },
+      { name: "FlammenHerzRadio", type: "lautfm", url: "https://laut.fm" },
+      { name: "Flash-Fire-Radio", type: "lautfm", url: "https://laut.fm" },
+      { name: "HallOfMusic", type: "lautfm", url: "https://laut.fm" },
+      { name: "Hitradio-Mathildenhof", type: "lautfm", url: "https://laut.fm" },
+      { name: "Hitradio-Ruhr", type: "lautfm", url: "https://laut.fm" },
+      { name: "HundertProzentDeutsch", type: "lautfm", url: "https://laut.fm" },
+      { name: "Khorde", type: "lautfm", url: "https://laut.fm" },
+      { name: "KiezRadio", type: "lautfm", url: "https://laut.fm" },
+Verwende Code mit Vorsicht.
+{ name: "Malan", type: "lautfm", url: "laut.fm" },
+{ name: "MegaSoundMix", type: "lautfm", url: "laut.fm" },
+{ name: "meintobi.de", type: "lautfm", url: "laut.fm" },
+{ name: "MiraFM", type: "lautfm", url: "laut.fm" },
+{ name: "Music-of-Dreams", type: "lautfm", url: "laut.fm" },
+{ name: "MusicForYouFM", type: "lautfm", url: "laut.fm" },
+{ name: "MusicPowerBeat", type: "lautfm", url: "laut.fm" },
+{ name: "Musik-Power", type: "lautfm", url: "laut.fm" },
+{ name: "MusikPowerRuhrgebiet", type: "lautfm", url: "laut.fm" },
+{ name: "MWR1", type: "lautfm", url: "laut.fm" },
+{ name: "NAR-Group Alf", type: "lautfm", url: "laut.fm" },
+{ name: "NAR-Group Main", type: "lautfm", url: "laut.fm" },
+{ name: "NAR-Group Mosel", type: "lautfm", url: "laut.fm" },
+{ name: "OldieWelle-Roding", type: "lautfm", url: "laut.fm" },
+{ name: "Paderborn", type: "lautfm", url: "laut.fm" },
+{ name: "Peters-Music-Diner", type: "lautfm", url: "laut.fm" },
+{ name: "PopRadioNRW", type: "lautfm", url: "laut.fm" },
+{ name: "Radio Kelmis", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Frankenmeile", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Jim", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Music-House", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Neumark", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Party", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Schlagerwahn-Mix", type: "lautfm", url: "laut.fm" },
+{ name: "Radio-Sunshine-Musik", type: "lautfm", url: "laut.fm" },
+{ name: "Radio48Crash", type: "lautfm", url: "laut.fm" },
+{ name: "Radio89423", type: "lautfm", url: "laut.fm" },
+{ name: "RadioAmPark1", type: "lautfm", url: "laut.fm" },
+{ name: "RadioBischofswerda", type: "lautfm", url: "laut.fm" },
+{ name: "RadioEuphoria", type: "lautfm", url: "laut.fm" },
+{ name: "RadioFunDisko", type: "lautfm", url: "laut.fm" },
+{ name: "RadioTanzPalast", type: "lautfm", url: "laut.fm" },
+{ name: "RadioWorld-FM", type: "lautfm", url: "laut.fm" },
+{ name: "Rendez-VousNostalgie", type: "lautfm", url: "laut.fm" },
+{ name: "Sandys-Musikwelt", type: "lautfm", url: "laut.fm" },
+{ name: "Schlager-Nonstop", type: "lautfm", url: "laut.fm" },
+{ name: "Schlagerstar", type: "lautfm", url: "laut.fm" },
+{ name: "SciFi-Radio", type: "lautfm", url: "laut.fm" },
+{ name: "Shout-FM", type: "lautfm", url: "laut.fm" },
+{ name: "Sound-Magic", type: "lautfm", url: "laut.fm" },
+{ name: "SoundBox-FM", type: "lautfm", url: "laut.fm" },
+{ name: "TechnoFM", type: "lautfm", url: "laut.fm" },
+{ name: "Torsten-Tune", type: "lautfm", url: "laut.fm" },
+{ name: "UdoFM (MexFM)", type: "lautfm", url: "laut.fm" },
+{ name: "Ultra-Hit-Radio", type: "lautfm", url: "laut.fm" },
+{ name: "Victoria-Justice", type: "lautfm", url: "laut.fm" },
+{ name: "VisionRadio", type: "lautfm", url: "laut.fm" },
+{ name: "ViVa Deutschland", type: "lautfm", url: "laut.fm" },
+{ name: "VogtlandWelle", type: "lautfm", url: "laut.fm" },
+{ name: "WebRadioBischofswerda", type: "lautfm", url: "laut.fm" }
+];
+const state = RADIOS.map((r, i) => ({
+...r,
+id: i,
+status: "loading",
+listeners: 0,
+song: "Wird geprüft..."
+}));
+const PROXY = "allorigins.win";
+async function fetchWithTimeout(url, ms = 7000) {
+const ctrl = new AbortController();
+const t = setTimeout(() => ctrl.abort(), ms);
+try {
+const res = await fetch(url, { signal: ctrl.signal });
+clearTimeout(t);
+return res;
+} catch (e) {
+clearTimeout(t);
+throw e;
+}
+}
+async function checkRadio(item) {
+try {
+if (item.type === "lautfm") {
+const slug = item.url.replace(//+$/, "").split("/").pop();
+const [stRes, songRes] = await Promise.all([
+fetchWithTimeout(https://laut.fm{slug}),
+fetchWithTimeout(https://laut.fm{slug}/current_song)
+]);
+if (!stRes.ok) throw new Error("offline");
+const stData = await stRes.json();
+const songData = songRes.ok ? await songRes.json() : null;
+item.status = "online";
+item.listeners = Number(stData.listeners || 0);
+if (songData && songData.title) {
+const art = songData.artist && songData.artist.name ? songData.artist.name : "";
+item.song = art ? ${art} – ${songData.title} : songData.title;
+} else {
+item.song = stData.display_name || "Live Stream";
+}
+} else if (item.type === "azuracast") {
+const res = await fetchWithTimeout(item.url);
+if (!res.ok) throw new Error("offline");
+const data = await res.json();
+item.status = data.is_online ? "online" : "offline";
+item.listeners = Number((data.listeners && data.listeners.current) || 0);
+item.song = (data.now_playing && data.now_playing.song && data.now_playing.song.text) || "Live Stream";
+} else if (item.type === "shoutcast") {
+const clean = item.url.replace(//+$/, "");
+const res = await fetchWithTimeout(PROXY + encodeURIComponent(clean + "/stats?json=1"));
+if (!res.ok) throw new Error("offline");
+const data = await res.json();
+if (data && typeof data.currentlisteners !== "undefined") {
+item.status = Number(data.streamstatus) === 1 || Number(data.currentlisteners) > 0 || data.songtitle ? "online" : "offline";
+item.listeners = Number(data.currentlisteners || 0);
+item.song = data.songtitle || "Shoutcast Stream";
+} else {
+throw new Error("offline");
+}
+} else if (item.type === "icecast") {
+const clean = item.url.replace(//+$/, "");
+const res = await fetchWithTimeout(PROXY + encodeURIComponent(clean + "/status-json.xsl"));
+if (!res.ok) throw new Error("offline");
+const data = await res.json();
+const src = data && data.icestats && data.icestats.source;
+const s = Array.isArray(src) ? src[0] : src;
+if (s) {
+item.status = "online";
+item.listeners = Number(s.listeners || 0);
+item.song = s.title || s.server_name || "Icecast Stream";
+} else {
+throw new Error("offline");
+}
+}
+} catch (e) {
+item.status = "offline";
+item.listeners = 0;
+item.song = "Offline / Kein Signal";
+}
+}
+function render() {
+const q = document.getElementById("search").value.trim().toLowerCase();
+const filter = document.getElementById("filter-status").value;
+const sort = document.getElementById("sort-by").value;
+let list = state.filter(item => {
+if (filter === "online" && item.status !== "online") return false;
+if (filter === "offline" && item.status !== "offline") return false;
+if (q && !item.name.toLowerCase().includes(q) && !item.song.toLowerCase().includes(q)) return false;
+return true;
+});
+list.sort((a, b) => {
+if (a.pinned && !b.pinned) return -1;
+if (!a.pinned && b.pinned) return 1;
+if (sort === "listeners") {
+if (b.listeners !== a.listeners) return b.listeners - a.listeners;
+if (a.status === "online" && b.status !== "online") return -1;
+if (a.status !== "online" && b.status === "online") return 1;
+}
+return a.name.localeCompare(b.name, "de");
+});
+const onlineCount = state.filter(x => x.status === "online").length;
+const offlineCount = state.filter(x => x.status === "offline").length;
+const totalListeners = state.reduce((acc, x) => acc + (x.status === "online" ? x.listeners : 0), 0);
+document.getElementById("sum-listeners").textContent = totalListeners;
+document.getElementById("sum-online").textContent = onlineCount;
+document.getElementById("sum-offline").textContent = offlineCount;
+document.getElementById("sum-total").textContent = state.length;
+const grid = document.getElementById("grid");
+grid.innerHTML = list.map(item => {
+const badgeClass = item.status === "online" ? "on" : (item.status === "offline" ? "off" : "load");
+const badgeText = item.status === "online" ? ${item.listeners} Hörer : (item.status === "offline" ? "Offline" : "Prüfe...");
+const cardClass = card ${item.status} ${item.pinned ? "pinned" : ""};
+return <div class="${cardClass}"> <div class="card-top"> <div class="radio-name" title="${item.name}">${item.pinned ? "⭐ " : ""}${item.name}</div> <span class="badge ${badgeClass}">${badgeText}</span> </div> <div class="song" title="${item.song}">${item.song}</div> <div class="meta"> <span>System: ${item.type.toUpperCase()}</span> <span>${item.status === "online" ? "● Live" : "● Kein Signal"}</span> </div> </div>;
+}).join("");
+}
+async function refreshAll() {
+document.getElementById("last-update").textContent = "Aktualisiere Live-Daten...";
+render();
+const batchSize = 10;
+for (let i = 0; i < state.length; i += batchSize) {
+const batch = state.slice(i, i + batchSize);
+await Promise.all(batch.map(checkRadio));
+render();
+}
+const now = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+document.getElementById("last-update").textContent = Zuletzt aktualisiert: ${now} Uhr;
+}
+refreshAll();
+setInterval(refreshAll, 30000);
