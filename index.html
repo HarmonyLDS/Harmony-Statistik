@@ -204,12 +204,14 @@
   </div>
 
   <script>
+    const ALL_DAYS = ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"];
+
     const RADIOS = [
       // Pinned
-      { name: "Harmonys-Jukebox", type: "lautfm", url: "https://laut.fm", pinned: true, tags: ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"] },
+      { name: "Harmonys-Jukebox", type: "lautfm", url: "https://laut.fm", pinned: true, tags: ALL_DAYS },
 
       // AzuraCast
-      { name: "Radio Schmölln", type: "azuracast", url: "https://streamingcloud.online", tags: ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"] },
+      { name: "Radio Schmölln", type: "azuracast", url: "https://streamingcloud.online", tags: ALL_DAYS },
       { name: "beatsXpress", type: "azuracast", url: "https://nexusradio-hosting.de", tags: ["harmony_mo", "harmony_sa"] },
       { name: "Radio AlterKessel", type: "azuracast", url: "https://jom-hosting.de", tags: ["bernie_di"] },
 
@@ -227,84 +229,84 @@
       { name: "RadioFunAndMore", type: "icecast", url: "https://spcast.eu", tags: ["bernie_di"] },
 
       // Custom API (aggregiert)
-      { name: "1Chaos71 (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: [] },
-      { name: "Florian (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: [] },
-      { name: "Schlagermax (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: [] },
+      { name: "1Chaos71 (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: ALL_DAYS },
+      { name: "Florian (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: ALL_DAYS },
+      { name: "Schlagermax (Kombiniert)", type: "custom", url: "https://harmonys-jukebox.de", tags: ALL_DAYS },
 
       // laut.fm
       { name: "Antenne Fehmarn", type: "lautfm", url: "https://laut.fm", tags: ["bernie_di"] },
 Verwende Code mit Vorsicht.
 { name: "Antenne-Steilshoop", type: "lautfm", url: "laut.fm", tags: ["harmony_mo", "harmony_sa"] },
-{ name: "AntenneKrefeld", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Bergers-MusikParadies", type: "lautfm", url: "laut.fm", tags: ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"] },
-{ name: "Bergers-SchlagerParadies", type: "lautfm", url: "laut.fm", tags: ["harmony_mo", "harmony_sa", "bernie_di", "bernie_do"] },
+{ name: "AntenneKrefeld", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Bergers-MusikParadies", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Bergers-SchlagerParadies", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
 { name: "Charlys-Funradio (cfr)", type: "lautfm", url: "laut.fm", tags: ["harmony_mo"] },
-{ name: "Crazy-Fox-Radio (BlackTiger)", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "DattKüstenRadio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "DerBruklerFM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Disco-Power-Radio (crazyhomeradio)", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "DJ Raimund", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Eberts-KaffeeRadio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Elbe-Deutsch", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Fabian-Dance-Radio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Familienradio-Düsseldorf", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "FlammenHerzRadio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Flash-Fire-Radio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "HallOfMusic", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Hitradio-Mathildenhof", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Hitradio-Ruhr", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "HundertProzentDeutsch", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Khorde", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "KiezRadio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Malan", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "MegaSoundMix", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "meintobi.de", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "MiraFM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Music-of-Dreams", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "MusicForYouFM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "MusicPowerBeat", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Musik-Power", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "MusikPowerRuhrgebiet", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "MWR1", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "NAR-Group Alf", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "NAR-Group Main", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "NAR-Group Mosel", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "OldieWelle-Roding", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Paderborn", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Peters-Music-Diner", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "PopRadioNRW", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio Kelmis", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Frankenmeile", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Jim", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Music-House", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Neumark", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Party", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Schlagerwahn-Mix", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio-Sunshine-Musik", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio48Crash", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Radio89423", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "RadioAmPark1", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "RadioBischofswerda", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "RadioEuphoria", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "RadioFunDisko", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "RadioTanzPalast", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "RadioWorld-FM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Rendez-VousNostalgie", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Sandys-Musikwelt", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Schlager-Nonstop", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Schlagerstar", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "SciFi-Radio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Shout-FM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Sound-Magic", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "SoundBox-FM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "TechnoFM", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Torsten-Tune", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "UdoFM (MexFM)", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Ultra-Hit-Radio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "Victoria-Justice", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "VisionRadio", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "ViVa Deutschland", type: "lautfm", url: "laut.fm", tags: [] },
-{ name: "WebRadioBischofswerda", type: "lautfm", url: "laut.fm", tags: [] }
+{ name: "Crazy-Fox-Radio (BlackTiger)", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "DattKüstenRadio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "DerBruklerFM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Disco-Power-Radio (crazyhomeradio)", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "DJ Raimund", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Eberts-KaffeeRadio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Elbe-Deutsch", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Fabian-Dance-Radio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Familienradio-Düsseldorf", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "FlammenHerzRadio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Flash-Fire-Radio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "HallOfMusic", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Hitradio-Mathildenhof", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Hitradio-Ruhr", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "HundertProzentDeutsch", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Khorde", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "KiezRadio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Malan", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "MegaSoundMix", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "meintobi.de", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "MiraFM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Music-of-Dreams", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "MusicForYouFM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "MusicPowerBeat", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Musik-Power", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "MusikPowerRuhrgebiet", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "MWR1", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "NAR-Group Alf", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "NAR-Group Main", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "NAR-Group Mosel", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "OldieWelle-Roding", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Paderborn", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Peters-Music-Diner", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "PopRadioNRW", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio Kelmis", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Frankenmeile", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Jim", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Music-House", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Neumark", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Party", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Schlagerwahn-Mix", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio-Sunshine-Musik", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio48Crash", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Radio89423", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "RadioAmPark1", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "RadioBischofswerda", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "RadioEuphoria", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "RadioFunDisko", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "RadioTanzPalast", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "RadioWorld-FM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Rendez-VousNostalgie", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Sandys-Musikwelt", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Schlager-Nonstop", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Schlagerstar", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "SciFi-Radio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Shout-FM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Sound-Magic", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "SoundBox-FM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "TechnoFM", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Torsten-Tune", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "UdoFM (MexFM)", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Ultra-Hit-Radio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "Victoria-Justice", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "VisionRadio", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "ViVa Deutschland", type: "lautfm", url: "laut.fm", tags: ALL_DAYS },
+{ name: "WebRadioBischofswerda", type: "lautfm", url: "laut.fm", tags: ALL_DAYS }
 ];
 const TAB_LABELS = {
 harmony_mo: "Harmony – Montag",
@@ -327,37 +329,42 @@ if (btn) btn.classList.add("active");
 document.getElementById("active-subtitle").textContent = "Ansicht: " + (TAB_LABELS[tab] || tab);
 render();
 }
-async function fetchWithProxy(targetUrl) {
+async function fetchText(url, timeoutMs = 8000) {
 const controller = new AbortController();
-const timeout = setTimeout(() => controller.abort(), 9000);
+const timer = setTimeout(() => controller.abort(), timeoutMs);
 try {
-const res = await fetch(targetUrl, { signal: controller.signal });
-clearTimeout(timeout);
-if (res.ok) return await res.text();
+const res = await fetch(url, { signal: controller.signal });
+clearTimeout(timer);
+if (!res.ok) return null;
+return await res.text();
 } catch (_) {
-clearTimeout(timeout);
-}
-const proxyUrl = https://allorigins.win{encodeURIComponent(targetUrl)};
-const controller2 = new AbortController();
-const timeout2 = setTimeout(() => controller2.abort(), 10000);
-try {
-const res2 = await fetch(proxyUrl, { signal: controller2.signal });
-clearTimeout(timeout2);
-if (!res2.ok) return null;
-const data = await res2.json();
-return data.contents || null;
-} catch (_) {
-clearTimeout(timeout2);
+clearTimeout(timer);
 return null;
 }
+}
+async function fetchWithFallback(targetUrl) {
+if (targetUrl.startsWith("https://")) {
+const direct = await fetchText(targetUrl, 7000);
+if (direct) return direct;
+}
+const proxy1 = await fetchText(https://codetabs.com{encodeURIComponent(targetUrl)}, 9000);
+if (proxy1) return proxy1;
+const proxy2Raw = await fetchText(https://allorigins.win{encodeURIComponent(targetUrl)}, 9000);
+if (proxy2Raw) {
+try {
+const parsed = JSON.parse(proxy2Raw);
+if (parsed && parsed.contents) return parsed.contents;
+} catch (_) {}
+}
+return null;
 }
 async function fetchRadioStatus(radio) {
 try {
 if (radio.type === "lautfm") {
 const slug = radio.url.replace(//+$/, "").split("/").pop();
-const res = await fetch(https://laut.fm{slug});
-if (!res.ok) throw new Error("laut.fm Fehler");
-const data = await res.json();
+const text = await fetchText(https://laut.fm{slug}, 8000);
+if (!text) throw new Error("laut.fm Fehler");
+const data = JSON.parse(text);
 const songTitle = data.current_song
 ? ${data.current_song.artist?.name || ""} - ${data.current_song.title || ""}.replace(/^ - | - $/g, "")
 : "Live-Stream aktiv";
@@ -368,18 +375,18 @@ song: songTitle || "Live-Stream aktiv"
 };
 }
 if (radio.type === "azuracast") {
-const text = await fetchWithProxy(radio.url);
+const text = await fetchWithFallback(radio.url);
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
 const item = Array.isArray(json) ? json[0] : json;
 return {
 status: "online",
-listeners: Number(item.listeners?.current) || 0,
-song: item.now_playing?.song?.text || "Live-Stream aktiv"
+listeners: Number(item?.listeners?.current) || 0,
+song: item?.now_playing?.song?.text || "Live-Stream aktiv"
 };
 }
 if (radio.type === "custom") {
-const text = await fetchWithProxy(radio.url);
+const text = await fetchWithFallback(radio.url);
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
 const listeners = Number(json.listeners ?? json.currentlisteners ?? json.total_listeners ?? 0);
@@ -392,7 +399,7 @@ song
 }
 if (radio.type === "icecast") {
 const baseUrl = radio.url.replace(//+$/, "");
-const text = await fetchWithProxy(${baseUrl}/status-json.xsl);
+const text = await fetchWithFallback(${baseUrl}/status-json.xsl);
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
 const sources = json.icestats?.source;
@@ -404,7 +411,7 @@ return { status: "online", listeners, song };
 }
 if (radio.type === "shoutcast") {
 const baseUrl = radio.url.replace(//+$/, "");
-const text = await fetchWithProxy(${baseUrl}/stats?json=1);
+const text = await fetchWithFallback(${baseUrl}/stats?json=1);
 if (!text) throw new Error("Keine Antwort");
 const json = JSON.parse(text);
 const listeners = Number(json.currentlisteners ?? json.uniquelisteners ?? 0);
@@ -423,7 +430,7 @@ return { status: "offline", listeners: 0, song: "Offline / Keine Antwort" };
 async function refreshAll() {
 const updateEl = document.getElementById("last-update");
 updateEl.textContent = "Aktualisiere Live-Daten...";
-const batchSize = 15;
+const batchSize = 12;
 const updated = [...radioStates];
 for (let i = 0; i < RADIOS.length; i += batchSize) {
 const batch = RADIOS.slice(i, i + batchSize);
@@ -496,4 +503,3 @@ setInterval(refreshAll, 30000);
 </script>
 </body>
 </html>
-
