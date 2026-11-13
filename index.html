@@ -213,18 +213,18 @@
 
     const RAW = [
       ["Harmonys-Jukebox", "lautfm", "harmonys-jukebox", D_ALL, 1],
-      ["Radio Schmölln", "azuracast", "https://streamingcloud.online", D_ALL],
-      ["beatsXpress", "azuracast", "https://nexusradio-hosting.de", D_H_BOTH],
-      ["Radio AlterKessel", "azuracast", "https://jom-hosting.de", D_B_DI],
-      ["Hitradio-Breitungen", "shoutcast", "http://genx-stream.de", ["harmony_mo", "bernie_di"]],
-      ["Joker-Radio", "shoutcast", "http://streamserver24.com", ["harmony_sa", "bernie_di"]],
-      ["Power-of-Dream", "shoutcast", "http://pofd-hosting.de", D_H_BOTH],
-      ["Radio-Forum", "shoutcast", "http://178.33.33.176:8110", ["harmony_mo", "harmony_sa", "bernie_do"]],
-      ["RadioDD63", "shoutcast", "https://streamplus.de", ["harmony_mo", "harmony_sa", "bernie_di"]],
-      ["RWWO RADIO", "shoutcast", "http://92.222.193.229:8204", D_H_BOTH],
-      ["Summer-Beats-Radio", "shoutcast", "https://mein-radiostream.de", D_H_MO],
-      ["GartenHeimRadio", "icecast", "https://spcast.eu", ["harmony_mo", "harmony_sa", "bernie_di"]],
-      ["RadioFunAndMore", "icecast", "https://spcast.eu", D_B_DI],
+       ["Radio Schmölln", "azuracast", "https://" + "streamingcloud.online", D_ALL],
+      ["beatsXpress", "azuracast", "https://" + "azura2.nexusradio-hosting.de/api/nowplaying/18", D_H_BOTH],
+      ["Radio AlterKessel", "azuracast", "https://" + "streamserver.jom-hosting.de/api/nowplaying/26", D_B_DI],
+      ["Hitradio-Breitungen", "shoutcast", "http://" + "s3.genx-stream.de:8900", ["harmony_mo", "bernie_di"]],
+      ["Joker-Radio", "shoutcast", "http://" + "://streamserver24.com", ["harmony_sa", "bernie_di"]],
+      ["Power-of-Dream", "shoutcast", "http://" + "stream1.pofd-hosting.de:8028", D_H_BOTH],
+      ["Radio-Forum", "shoutcast", "http://" + "178.33.33.176:8110", ["harmony_mo", "harmony_sa", "bernie_do"]],
+      ["RadioDD63", "shoutcast", "https://" + "server35800.streamplus.de", ["harmony_mo", "harmony_sa", "bernie_di"]],
+      ["RWWO RADIO", "shoutcast", "http://" + "92.222.193.229:8204", D_H_BOTH],
+      ["Summer-Beats-Radio", "shoutcast", "https://" + "cast2.mein-radiostream.de:8008", D_H_MO],
+      ["GartenHeimRadio", "icecast", "https://" + "gartenheimradio.spcast.eu", ["harmony_mo", "harmony_sa", "bernie_di"]],
+      ["RadioFunAndMore", "icecast", "https://" + "radiofunandmore.spcast.eu", D_B_DI],
       ["1Chaos71 (Kombiniert)", "custom", "chaosfunk", D_ALL],
       ["Florian (Kombiniert)", "custom", "sffdffhsr", D_ALL],
       ["Schlagermax (Kombiniert)", "custom", "schlagermax", D_ALL],
@@ -240,7 +240,7 @@
       ["Disco-Power-Radio (crazyhomeradio)", "lautfm", "crazyhomeradio", D_ALL],
       ["DJ Raimund", "lautfm", "dj_raimund", D_ALL],
       ["Eberts-KaffeeRadio", "lautfm", "eberts-kaffeeradio", D_ALL],
-Verwende Code mit Vorsicht.
+
 ["Elbe-Deutsch", "lautfm", "elbe-deutsch", D_ALL],
 ["Fabian-Dance-Radio", "lautfm", "fabian-dance-radio", D_ALL],
 ["Familienradio-Düsseldorf", "lautfm", "a-d-g", D_ALL],
@@ -304,8 +304,8 @@ Verwende Code mit Vorsicht.
 ];
 const RADIOS = RAW.map(function(x) {
 let fullUrl = x.at(2);
-if (x.at(1) === "lautfm") fullUrl = "laut.fm" + x.at(2);
-if (x.at(1) === "custom") fullUrl = "harmonys-jukebox.de" + x.at(2);
+      if (x.at(1) === "lautfm") fullUrl = "https://" + "laut.fm/" + x.at(2);
+      if (x.at(1) === "custom") fullUrl = "https://" + "status.harmonys-jukebox.de/custom_api.php?station=" + x.at(2);
 return { name: x.at(0), type: x.at(1), target: x.at(2), url: fullUrl, tags: x.at(3), pinned: !!x.at(4) };
 });
 const TAB_LABELS = {
